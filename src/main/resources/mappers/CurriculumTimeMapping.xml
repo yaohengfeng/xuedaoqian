@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yhf.xuedaoqian.dao.CurriculumTimeDao">
+    <resultMap id="BaseResultType" type="com.yhf.xuedaoqian.model.CurriculumTime">
+        <id column="curriculum_time_id" jdbcType="VARCHAR" property="curriculumTimeId"/>
+        <result column="curriculum_id" jdbcType="VARCHAR" property="curriculumId"/>
+        <result column="week_day" jdbcType="VARCHAR" property="weekDay"/>
+        <result column="start_time" jdbcType="VARCHAR" property="startTime" />
+        <result column="end_time" jdbcType="VARCHAR" property="endTime" />
+        <result column="create_at" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       curriculum_time_id,curriculum_id,week_day,start_time,end_time,create_at,update_at
+    </sql>
+
+    <insert id="insertNewCurriculumTime" parameterType="com.yhf.xuedaoqian.model.CurriculumTime">
+        insert into public.curriculum_time
+        (curriculum_time_id, curriculum_id, week_day, start_time, end_time,create_at, update_at)
+        values
+        (#{curriculumTimeId},#{curriculumId},#{weekDay},#{startTime},#{endTime},
+        #{createAt},#{updateAt})
+    </insert>
+
+    <select id="selectCurriculumTimeList" resultMap="BaseResultType" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from public.curriculum_time where curriculum_id=#{curriculumId} order by week_day
+    </select>
+
+    <select id="selectCurriculumTimeInfo" resultMap="BaseResultType" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from public.curriculum_time where curriculum_time_id=#{curriculumTimeId}
+    </select>
+
+    <update id="updateCurriculumTimeInfo" parameterType="com.yhf.xuedaoqian.model.CurriculumTime">
+        update public.curriculum_time
+        <set>
+            <if test="weekDay != null">
+                week_day = #{weekDay},
+            </if>
+            <if test="startTime != null">
+                start_time = #{startTime},
+            </if>
+            <if test="endTime != null">
+                end_time = #{endTime},
+            </if>
+            <if test="createAt != null">
+                create_at=#{createAt}
+            </if>
+            <if test="updateAt != null">
+                update_at=#{updateAt}
+            </if>
+        </set>
+        where  curriculum_time_id = #{curriculumTimeId,jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteCurriculumTime" parameterType="String">
+        delete from public.curriculum_time where curriculum_time_id=#{curriculumTimeId}
+    </delete>
+
+    <delete id="deleteCurriculumTimeByCurriculumId" parameterType="String">
+        delete from public.curriculum_time where curriculum_id=#{curriculumId}
+    </delete>
+
+</mapper>

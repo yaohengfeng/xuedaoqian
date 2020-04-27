@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yhf.xuedaoqian.dao.SignDao">
+    <resultMap id="BaseResultType" type="com.yhf.xuedaoqian.model.Sign">
+        <id column="sign_id" jdbcType="VARCHAR" property="signId"/>
+        <result column="curriculum_id" jdbcType="VARCHAR" property="curriculumId"/>
+        <result column="create_user_id" jdbcType="VARCHAR" property="createUserId"/>
+        <result column="sign_in_code" jdbcType="VARCHAR" property="signInCode"/>
+        <result column="sign_flag" jdbcType="SMALLINT" property="signFlag"/>
+        <result column="create_at" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       sign_id,curriculum_id,create_user_id,sign_in_code,sign_flag,create_at,update_at
+    </sql>
+
+    <insert id="insertSign" parameterType="com.yhf.xuedaoqian.model.Sign">
+            insert into public.sign
+            (sign_id, curriculum_id, create_user_id, sign_flag, sign_in_code,create_at, update_at)
+            values
+            (#{signId},#{curriculumId},#{createUserId},#{signFlag},#{signInCode},#{createAt},#{updateAt})
+    </insert>
+
+    <select id="selectSignByCurriculumId" resultMap="BaseResultType" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from public.sign where curriculum_id=#{curriculumId} order by sign_flag ASC
+    </select>
+
+    <select id="selectSignBySignId" parameterType="String" resultMap="BaseResultType">
+        select
+        <include refid="Base_Column_List"/>
+        from public.sign where sign_id=#{signId}
+    </select>
+
+    <update id="updateSingFlag" parameterType="com.yhf.xuedaoqian.model.Sign">
+        update public.sign
+        set sign_flag=#{signFlag}
+        where sign_id=#{signId}
+    </update>
+
+    <select id="selectSignIdByCurriculumId" parameterType="String" resultType="String">
+        select sign_id from public.sign where  curriculum_id=#{curriculumId} and  sign_flag=1
+    </select>
+
+</mapper>

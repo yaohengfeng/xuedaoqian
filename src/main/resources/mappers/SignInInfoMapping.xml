@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yhf.xuedaoqian.dao.SignInInfoDao">
+    <resultMap id="BaseResultType" type="com.yhf.xuedaoqian.model.SignInInfo">
+        <id column="sign_in_info_id" jdbcType="VARCHAR" property="signInInfoId"/>
+        <result column="sign_id" jdbcType="VARCHAR" property="signId"/>
+        <result column="curriculum_id" jdbcType="VARCHAR" property="curriculumId"/>
+        <result column="student_id" jdbcType="VARCHAR" property="studentId"/>
+        <result column="sign_flag" jdbcType="SMALLINT" property="signFlag"/>
+        <result column="create_at" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt"/>
+    </resultMap>
+
+    <resultMap id="BaseResultType1" type="com.yhf.xuedaoqian.model.reps.SignInfoReps">
+        <id column="sign_in_info_id" jdbcType="VARCHAR" property="signInInfoId"/>
+        <result column="sign_id" jdbcType="VARCHAR" property="signId"/>
+        <result column="student_id" jdbcType="VARCHAR" property="studentId"/>
+        <result column="user_name" jdbcType="VARCHAR" property="studentName"/>
+        <result column="sign_flag" jdbcType="SMALLINT" property="signFlag"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       sign_in_info_id,sign_id,curriculum_id,student_id,sign_flag,create_at,update_at
+    </sql>
+
+    <insert id="insertSignInfoList" parameterType="java.util.List">
+        <foreach collection="list" item="signInfo" separator=";">
+            insert into public.sign_in_info
+            (sign_in_info_id, sign_id ,curriculum_id, student_id, sign_flag, create_at, update_at)
+            values
+            (#{signInfo.signInInfoId},#{signInfo.signId},
+            #{signInfo.studentId},#{signInfo.signFlag},#{signInfo.createAt},#{signInfo.updateAt})
+        </foreach>
+    </insert>
+
+    <insert id="insertSignInfo" parameterType="com.yhf.xuedaoqian.model.SignInInfo">
+            insert into public.sign_in_info
+            (sign_in_info_id, sign_id ,curriculum_id,student_id, sign_flag, create_at, update_at)
+            values
+            (#{signInInfoId},#{signId},#{curriculumId},#{studentId},#{signFlag},#{createAt},#{updateAt})
+    </insert>
+
+    <select id="selectSignInfo" resultMap="BaseResultType1" parameterType="String">
+        select
+        sii.student_id,sign_in_info_id,u.user_name,sign_flag,sii.sign_id
+        from public.sign_in_info sii
+        left join public.wx_user u
+        on sii.student_id=u.user_id
+        where sign_id=#{signId} order by sii.sign_flag
+    </select>
+
+    <update id="updateSignFlag">
+        update public.sign_in_info
+        set sign_flag=1, update_at = now()
+        where sign_id=#{signId} and student_id=#{studentId}
+    </update>
+
+</mapper>

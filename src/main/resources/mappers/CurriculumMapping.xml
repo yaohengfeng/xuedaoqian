@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yhf.xuedaoqian.dao.CurriculumDao">
+    <resultMap id="BaseResultType" type="com.yhf.xuedaoqian.model.Curriculum">
+        <id column="curriculum_id" jdbcType="VARCHAR" property="curriculumId"/>
+        <result column="class_id" jdbcType="VARCHAR" property="classId"/>
+        <result column="curriculum_name" jdbcType="VARCHAR" property="curriculumName"/>
+        <result column="teacher_id" jdbcType="VARCHAR" property="teacherId"/>
+        <result column="create_at" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt"/>
+    </resultMap>
+
+    <resultMap id="BaseResultType1" type="com.yhf.xuedaoqian.model.reps.CurriculumReps">
+        <id column="curriculum_id" jdbcType="VARCHAR" property="curriculumId"/>
+        <result column="curriculum_name" jdbcType="VARCHAR" property="curriculumName"/>
+        <result column="teacher_id" jdbcType="VARCHAR" property="teacherId"/>
+        <result column="user_name" jdbcType="VARCHAR" property="teacherName"/>
+    </resultMap>
+
+    <resultMap id="BaseResultType2" type="com.yhf.xuedaoqian.model.reps.CurriculumTimeReps">
+        <id column="curriculum_id" jdbcType="VARCHAR" property="curriculumId"/>
+        <result column="class_id" jdbcType="VARCHAR" property="classId"/>
+        <result column="teacher_id" jdbcType="VARCHAR" property="teacherId"/>
+        <result column="curriculum_time_id" jdbcType="VARCHAR" property="curriculumTimeId"/>
+        <result column="class_name" jdbcType="VARCHAR" property="className"/>
+        <result column="curriculum_name" jdbcType="VARCHAR" property="curriculumName"/>
+        <result column="week_day" jdbcType="VARCHAR" property="weekDay"/>
+        <result column="start_day" jdbcType="VARCHAR" property="startDay"/>
+        <result column="end_day" jdbcType="VARCHAR" property="endDay"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       curriculum_id, class_id,curriculum_name,teacher_id,create_at,update_at
+    </sql>
+
+    <insert id="insertCurriculum" parameterType="com.yhf.xuedaoqian.model.Curriculum">
+        insert into public.curriculum
+        (curriculum_id, class_id, teacher_id, curriculum_name, create_at, update_at)
+        values
+        (#{curriculumId},#{classId},#{teacherId},#{curriculumName},
+        #{createAt},#{updateAt})
+    </insert>
+
+    <select id="selectCurriculumListByClassId" resultMap="BaseResultType" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from public.curriculum where class_id=#{classId}
+    </select>
+
+    <select id="selectCurriculumInfo" resultMap="BaseResultType" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from public.curriculum where curriculum_id=#{curriculumId}
+    </select>
+
+    <select id="selectAllCurriculumTimeRepsByTeacherId" resultMap="BaseResultType2" parameterType="String">
+        select c.class_id,
+               ct.curriculum_id,
+               c.teacher_id,
+               ct.curriculum_time_id,
+               curriculum_name,
+               sc.class_name,
+               ct.week_day,
+               ct.start_time,
+               ct.end_time
+        from public.curriculum c
+                 join public.school_class sc
+                      on c.class_id = sc.class_id
+                 join public.curriculum_time ct
+                      on c.curriculum_id = ct.curriculum_id
+        where c.teacher_id = #{teacherId} and week_day=#{weekDay}
+        ORDER BY  start_time,end_time
+    </select>
+
+    <select id="selectCurriculumRepsInfo" resultMap="BaseResultType1" parameterType="String">
+        select
+        curriculum_id,curriculum_name,teacher_id,wu.user_name
+        from public.curriculum cu
+        join public.wx_user wu
+        on cu.teacher_id=wu.user_id
+        where curriculum_id=#{curriculumId}
+    </select>
+
+    <update id="updateCurriculum" parameterType="com.yhf.xuedaoqian.model.Curriculum">
+        update public.curriculum
+        <set>
+            <if test="course_name != null">
+                user_name = #{userName,jdbcType=VARCHAR},
+            </if>
+            <if test="createAt != null">
+                create_at=#{createAt}
+            </if>
+            <if test="updateAt != null">
+                update_at=#{updateAt}
+            </if>
+        </set>
+        where curriculum_id = #{curriculumId,jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteCurriculumByCurriculumId" parameterType="String">
+        delete from public.curriculum where curriculum_id=#{curriculumId}
+    </delete>
+
+</mapper>

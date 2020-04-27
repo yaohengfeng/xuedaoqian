@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yhf.xuedaoqian.dao.ClassStudentsDao">
+    <resultMap id="BaseResultType" type="com.yhf.xuedaoqian.model.SchoolClassStudents">
+        <id column="scs_id" jdbcType="VARCHAR" property="classStudentId"/>
+        <result column="class_id" jdbcType="VARCHAR" property="classId"/>
+        <result column="student_id" jdbcType="VARCHAR" property="studentId"/>
+        <result column="student_name" jdbcType="VARCHAR" property="studentName"/>
+        <result column="sign_in_count" jdbcType="INTEGER" property="signInCount"/>
+        <result column="sign_state" jdbcType="SMALLINT" property="signState"/>
+        <result column="create_at" jdbcType="TIMESTAMP" property="createAt"/>
+        <result column="update_at" jdbcType="TIMESTAMP" property="updateAt"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+       scs_id,class_id,student_id,student_name,sign_in_count,sign_state,create_at,update_at
+    </sql>
+
+    <insert id="insertClassStudent" parameterType="com.yhf.xuedaoqian.model.SchoolClassStudents">
+            insert into public.school_class_students
+            (scs_id, class_id, student_id,student_name, sign_in_count, sign_state, create_at, update_at)
+            values
+            (#{classStudentId},#{classId},#{studentId},#{studentName},#{signInCount},#{signState},#{createAt},#{updateAt})
+    </insert>
+
+    <select id="selectUserByClassId" resultMap="BaseResultType" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from public.school_class_students where class_id=#{classId}
+    </select>
+
+    <select id="selectUserByScsId" parameterType="String" resultMap="BaseResultType">
+        select
+        <include refid="Base_Column_List"/>
+        from public.school_class_students
+        where scs_id=#{classStudentId}
+    </select>
+
+    <select id="selectScIdByClassIdAndStudentId" resultType="String">
+        select
+        scs_id
+        from public.school_class_students
+        where class_id=#{classId} and student_id = #{studentId}
+    </select>
+
+
+    <update id="updateClassStudentSignInFlag" parameterType="String">
+        update public.school_class_students set sign_state=1,sign_in_count=sign_in_count+1
+        where scs_id=#{classStudentId}
+    </update>
+
+    <update id="updateSignInFlagByClassIdAndStudentId">
+        update public.school_class_students set sign_state=1,sign_in_count=sign_in_count+1
+        where class_id=#{classId} and student_id =#{studentId}
+    </update>
+
+    <update id="updateAllStudentSignInFlag" parameterType="String">
+        update public.school_class_students set sign_state=0
+        where class_id=#{classId}
+    </update>
+
+
+    <delete id="deleteClassUserByUserId" parameterType="String">
+        delete from public.school_class_students where scs_id =#{classStudentId}
+    </delete>
+</mapper>
