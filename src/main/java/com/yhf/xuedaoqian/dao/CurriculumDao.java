@@ -29,4 +29,6 @@ public interface CurriculumDao {
     List<CurriculumTimeReps> selectAllCurriculumTimeRepsByTeacherId(@Param("teacherId") String teacherId,@Param("weekDay")String weekDay);
 
     void deleteCurriculumByCurriculumId(String curriculumId);
+
+    List<CurriculumTimeReps> selectAllCurriculumTimeRepsByStudentId(@Param("studentId") String studentId,@Param("weekDay") String weekDay);
 }

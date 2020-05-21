@@ -1,5 +1,6 @@
 package com.yhf.xuedaoqian.api;
 
+import com.yhf.xuedaoqian.model.KaoQinLv;
 import com.yhf.xuedaoqian.model.Sign;
 import com.yhf.xuedaoqian.model.reps.SignInReps;
 import com.yhf.xuedaoqian.model.reps.SignInfoReps;
@@ -85,7 +86,13 @@ public interface SignApi {
     */
     List<SignTimeReps> selectCurriculumSignList(String curriculumId);
 
-
-
+    /**
+    * @Description 根据课程id查询考勤率
+    * @Param [curriculumId]
+    * @return java.util.List<com.yhf.xuedaoqian.model.KaoQinLv>
+    * @Author yaohengfeng
+    * @Date 2020/5/15
+    */
+    List<KaoQinLv> selectKaoQinLv(String classId, String curriculumId);
 
 }

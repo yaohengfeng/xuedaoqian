@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -94,13 +95,23 @@ public class CurriculumService implements CurriculumApi {
 
     @Override
     public List<CurriculumTimeReps> selectCurriculumTimeByTeacherId(CurriculumRequestReps curriculumRequestReps) {
-        Assert.notNull(curriculumRequestReps.getTeacherId(), "教师Id不能为空");
-        System.out.println(curriculumRequestReps.getWeekDay());
+//        Assert.notNull(curriculumRequestReps.getTeacherId(), "教师Id不能为空");
+//        System.out.println(curriculumRequestReps.getWeekDay());
         if (curriculumRequestReps.getWeekDay() == null || "".equals(curriculumRequestReps.getWeekDay())) {
             curriculumRequestReps.setWeekDay(getWeekDay());
         }
+        List<CurriculumTimeReps> curriculumTimeRepsList=new ArrayList<>();
         System.out.println(curriculumRequestReps.getWeekDay());
-        return curriculumDao.selectAllCurriculumTimeRepsByTeacherId(curriculumRequestReps.getTeacherId(), curriculumRequestReps.getWeekDay());
+        if (curriculumRequestReps.getTeacherId() != null) {
+            curriculumTimeRepsList= curriculumDao.selectAllCurriculumTimeRepsByTeacherId(curriculumRequestReps.getTeacherId(), curriculumRequestReps.getWeekDay());
+        }
+        else if(curriculumRequestReps.getStudentId() != null){
+            curriculumTimeRepsList=curriculumDao.selectAllCurriculumTimeRepsByStudentId(curriculumRequestReps.getStudentId(), curriculumRequestReps.getWeekDay());
+        }else{
+            Assert.notNull(curriculumRequestReps.getTeacherId(), "教师Id不能为空");
+            Assert.notNull(curriculumRequestReps.getTeacherId(), "学生Id不能为空");
+        }
+        return curriculumTimeRepsList;
     }
 
 

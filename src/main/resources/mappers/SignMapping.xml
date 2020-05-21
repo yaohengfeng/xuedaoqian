@@ -44,4 +44,14 @@
         select sign_id from public.sign where  curriculum_id=#{curriculumId} and  sign_flag=1
     </select>
 
+    <select id="countSignNum" parameterType="String" resultType="Integer">
+        select count(*) from sign where curriculum_id=#{curriculumId}
+    </select>
+
+    <update id="autoUpdateSingFlag">
+        update public.sign
+        set sign_flag=2
+        where sign_flag=1
+    </update>
+
 </mapper>

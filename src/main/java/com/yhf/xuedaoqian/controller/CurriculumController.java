@@ -65,9 +65,10 @@ public class CurriculumController {
     }
 
     @PostMapping(value = "selectAllCurriculumList")
-    @ApiOperation(value = "查询课程详细信息")
+    @ApiOperation(value = "查询课程列表")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "query", name = "curriculumId", required = true),
+            @ApiImplicitParam(paramType = "query", name = "teacherId", required = true),
+            @ApiImplicitParam(paramType = "query", name = "weekDay", required = true),
     })
     @ResponseBody
     public List<CurriculumTimeReps> selectAllCurriculumList(CurriculumRequestReps curriculumRequestReps) {
@@ -75,7 +76,7 @@ public class CurriculumController {
     }
 
     @PostMapping(value = "deleteCurriculum")
-    @ApiOperation(value = "查询课程详细信息")
+    @ApiOperation(value = "删除课程详细")
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "curriculumId", required = true),
     })

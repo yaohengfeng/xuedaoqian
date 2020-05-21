@@ -1,7 +1,9 @@
 package com.yhf.xuedaoqian.controller;
 
 import com.yhf.xuedaoqian.api.SignApi;
+import com.yhf.xuedaoqian.model.KaoQinLv;
 import com.yhf.xuedaoqian.model.Sign;
+import com.yhf.xuedaoqian.model.reps.ClassAndCurriculumId;
 import com.yhf.xuedaoqian.model.reps.SignInReps;
 import com.yhf.xuedaoqian.model.reps.SignInfoReps;
 import com.yhf.xuedaoqian.model.reps.SignReps;
@@ -98,5 +100,16 @@ public class SignController {
     @ResponseBody
     public List<SignInfoReps> selectSignInoList(String signId) {
         return signApi.selectSignInfo(signId);
+    }
+
+    @PostMapping("selectKaoQinLvList")
+    @ApiOperation("查询考勤率")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "classId", required = true),
+            @ApiImplicitParam(paramType = "query", name = "curriculumId", required = true)
+    })
+    @ResponseBody
+    public List<KaoQinLv> selectKaoQinLvList(ClassAndCurriculumId c) {
+        return signApi.selectKaoQinLv(c.getClassId(),c.getCurriculumId());
     }
 }

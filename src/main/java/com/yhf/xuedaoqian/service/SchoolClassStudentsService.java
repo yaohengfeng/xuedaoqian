@@ -48,6 +48,9 @@ public class SchoolClassStudentsService implements SchoolClassStudentsApi {
             throw new RuntimeException("你已经加入班级，请勿重复加入");
         }
         SchoolClass schoolClassDB = schoolClassDao.selectClassInfo(classStudents.getClassId());
+        if (schoolClassDB.getTeacherId().equals(classStudents.getStudentId())){
+            throw new RuntimeException("不能加入自己创建的课程");
+        }
         if (schoolClassDB == null) {
             throw new RuntimeException("请输入正确的班级Id");
         }

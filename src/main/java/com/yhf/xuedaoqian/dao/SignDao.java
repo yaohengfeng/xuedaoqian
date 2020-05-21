@@ -22,4 +22,8 @@ public interface SignDao {
     Sign selectSignBySignId(String signId);
 
     String selectSignIdByCurriculumId(String curriculumId);
+
+    Integer countSignNum(String curriculumId);
+
+    void autoUpdateSingFlag();
 }

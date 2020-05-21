@@ -7,11 +7,13 @@ import com.yhf.xuedaoqian.dao.SchoolClassDao;
 import com.yhf.xuedaoqian.dao.SignDao;
 import com.yhf.xuedaoqian.dao.SignInInfoDao;
 import com.yhf.xuedaoqian.model.Curriculum;
+import com.yhf.xuedaoqian.model.KaoQinLv;
 import com.yhf.xuedaoqian.model.SchoolClass;
 import com.yhf.xuedaoqian.model.SchoolClassStudents;
 import com.yhf.xuedaoqian.model.SignInInfo;
 import com.yhf.xuedaoqian.model.reps.CurriculumReps;
 import com.yhf.xuedaoqian.model.reps.CurriculumTimeReps;
+import com.yhf.xuedaoqian.model.reps.KaoQinReps;
 import com.yhf.xuedaoqian.model.reps.SignInfoReps;
 import com.yhf.xuedaoqian.util.ToolUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -45,12 +48,12 @@ public class ClassStudentDaoTest {
 
     @Autowired
     public ClassStudentDaoTest(ClassStudentsDao classStudentsDao, SignInInfoDao signInInfoDao,
-                               SignDao signDao, CurriculumDao curriculumDao,SchoolClassDao classDao) {
+                               SignDao signDao, CurriculumDao curriculumDao, SchoolClassDao classDao) {
         this.classStudentsDao = classStudentsDao;
         this.signDao = signDao;
         this.signInInfoDao = signInInfoDao;
         this.curriculumDao = curriculumDao;
-        this.classDao=classDao;
+        this.classDao = classDao;
     }
 
     @Test
@@ -87,7 +90,7 @@ public class ClassStudentDaoTest {
 
     @Test
     void signIn() {
-        signInInfoDao.updateSignFlag("44afdabb-ef84-4d80-afda-bbef847d80b0","9044f5fc-3305-45ea-84f5-fc330595ea4f");
+        signInInfoDao.updateSignFlag("44afdabb-ef84-4d80-afda-bbef847d80b0", "9044f5fc-3305-45ea-84f5-fc330595ea4f");
 
 
 //        classStudentsDao.updateSignInFlagByClassIdAndStudentId("7f01256c-e8f1-4153-8125-6ce8f1615399", "1036ea77-ef4c-449e-b6ea-77ef4cb49ece");
@@ -122,14 +125,14 @@ public class ClassStudentDaoTest {
     }
 
     @Test
-    void selectCurriculum(){
-        String classId="7f01256c-e8f1-4153-8125-6ce8f1615399";
+    void selectCurriculum() {
+        String classId = "7f01256c-e8f1-4153-8125-6ce8f1615399";
         List<Curriculum> curricula = curriculumDao.selectCurriculumListByClassId(classId);
         System.out.println(curricula);
     }
 
     @Test
-    void selectCurriculumInfo(){
+    void selectCurriculumInfo() {
 //        CurriculumReps curriculumReps = curriculumDao.selectCurriculumRepsInfo("f6bd12e1-99a5-42fe-bd12-e199a5e2fe3c");
 //        System.out.println(curriculumReps);
         Date date = new Date();
@@ -144,7 +147,39 @@ public class ClassStudentDaoTest {
         if (w < 0)
             w = 0;
         System.out.println(weekDays[w]);
-        List<CurriculumTimeReps> curriculumList = curriculumDao.selectAllCurriculumTimeRepsByTeacherId("912fb893-ff", weekDays[w]);
+//        List<CurriculumTimeReps> curriculumList = curriculumDao.selectAllCurriculumTimeRepsByTeacherId("912fb893-ff", weekDays[w]);
+        List<CurriculumTimeReps> curriculumList = curriculumDao.selectAllCurriculumTimeRepsByStudentId("b8097f3a-6901-432b-897f-3a6901f32b76", "星期三");
         System.out.println(curriculumList);
+    }
+
+    @Test
+    void selectSign() {
+        Integer signNum = signDao.countSignNum("f6bd12e1-99a5-42fe-bd12-e199a5e2fe3c");
+        System.out.println(signNum);
+        List<KaoQinReps> kaoQinReps = signInInfoDao.selectSignSuccessNum("f6bd12e1-99a5-42fe-bd12-e199a5e2fe3c");
+        System.out.println(kaoQinReps);
+        List<KaoQinLv> kaoQinLvList = new ArrayList<>();
+        for (KaoQinReps k : kaoQinReps) {
+            KaoQinLv kaoQinLv = new KaoQinLv();
+            kaoQinLv.setStudentName(k.getUserName());
+            kaoQinLv.setPercentage(signNum != 0 ? ((k.getSuccessSignNum() / (float) signNum) * 100 + "%") : "0");
+            kaoQinLvList.add(kaoQinLv);
+        }
+        System.out.println(kaoQinLvList);
+    }
+
+    @Test
+    void selectSign1() {
+        Integer signNum = signDao.countSignNum("f6bd12e1-99a5-42fe-bd12-e199a5e2fe3c");
+        List<SchoolClassStudents> schoolClassStudentsList=classStudentsDao.selectUserByClassId("7f01256c-e8f1-4153-8125-6ce8f1615399");
+        List<KaoQinLv> kaoQinLvList = new ArrayList<>();
+        for (SchoolClassStudents s : schoolClassStudentsList) {
+            KaoQinLv kaoQinLv = new KaoQinLv();
+            kaoQinLv.setStudentName(s.getStudentName());
+            Integer stuSignNum = signInInfoDao.selectSignSuccessNumByStudentId(s.getStudentId());
+            kaoQinLv.setPercentage(signNum != 0 ? ((stuSignNum / (float) signNum) * 100 + "%") : "100%");
+            kaoQinLvList.add(kaoQinLv);
+        }
+        System.out.println(kaoQinLvList);
     }
 }

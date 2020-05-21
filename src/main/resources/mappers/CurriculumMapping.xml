@@ -72,6 +72,27 @@
         ORDER BY  start_time,end_time
     </select>
 
+    <select id="selectAllCurriculumTimeRepsByStudentId" resultMap="BaseResultType2" parameterType="String">
+        select c.class_id,
+               ct.curriculum_id,
+               c.teacher_id,
+               ct.curriculum_time_id,
+               curriculum_name,
+               sc.class_name,
+               ct.week_day,
+               ct.start_time,
+               ct.end_time
+        from public.curriculum c
+                 join public.school_class sc
+                      on c.class_id = sc.class_id
+                 join public.curriculum_time ct
+                      on c.curriculum_id = ct.curriculum_id
+                    join public.school_class_students scs
+                    on c.class_id=scs.class_id
+        where scs.student_id = #{studentId} and week_day=#{weekDay}
+        ORDER BY  start_time,end_time
+    </select>
+
     <select id="selectCurriculumRepsInfo" resultMap="BaseResultType1" parameterType="String">
         select
         curriculum_id,curriculum_name,teacher_id,wu.user_name

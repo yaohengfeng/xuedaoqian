@@ -8,11 +8,13 @@ import com.yhf.xuedaoqian.dao.SignDao;
 import com.yhf.xuedaoqian.dao.SignInInfoDao;
 import com.yhf.xuedaoqian.dao.WXUserDao;
 import com.yhf.xuedaoqian.model.Curriculum;
+import com.yhf.xuedaoqian.model.KaoQinLv;
 import com.yhf.xuedaoqian.model.SchoolClass;
 import com.yhf.xuedaoqian.model.SchoolClassStudents;
 import com.yhf.xuedaoqian.model.Sign;
 import com.yhf.xuedaoqian.model.SignInInfo;
 import com.yhf.xuedaoqian.model.WXUser;
+import com.yhf.xuedaoqian.model.reps.KaoQinReps;
 import com.yhf.xuedaoqian.model.reps.SignInReps;
 import com.yhf.xuedaoqian.model.reps.SignInfoReps;
 import com.yhf.xuedaoqian.model.reps.SignReps;
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author yaohengfeng
@@ -156,6 +159,26 @@ public class SignService implements SignApi {
         }
         System.out.println(signTimeRepsList);
         return signTimeRepsList;
+    }
+
+    @Override
+    public List<KaoQinLv> selectKaoQinLv(String classId, String curriculumId) {
+        Assert.notNull(curriculumId, "课程Id不能为空");
+        System.out.println(curriculumId);
+        if (curriculumDao.selectCurriculumInfo(curriculumId) == null) {
+            throw new RuntimeException("请输入正确的课程id");
+        }
+        Integer signNum = signDao.countSignNum(curriculumId);
+        List<SchoolClassStudents> schoolClassStudentsList = studentsDao.selectUserByClassId(classId);
+        List<KaoQinLv> kaoQinLvList = new ArrayList<>();
+        for (SchoolClassStudents s : schoolClassStudentsList) {
+            KaoQinLv kaoQinLv = new KaoQinLv();
+            kaoQinLv.setStudentName(s.getStudentName());
+            Integer stuSignNum = signInInfoDao.selectSignSuccessNumByStudentId(s.getStudentId());
+            kaoQinLv.setPercentage(signNum != 0 ? ((stuSignNum / (float) signNum) * 100 + "%") : "100%");
+            kaoQinLvList.add(kaoQinLv);
+        }
+        return kaoQinLvList;
     }
 
 

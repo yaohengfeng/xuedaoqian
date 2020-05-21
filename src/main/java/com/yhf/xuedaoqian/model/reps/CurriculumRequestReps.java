@@ -12,5 +12,6 @@ import java.io.Serializable;
 @Data
 public class CurriculumRequestReps implements Serializable {
     private String teacherId;
+    private String studentId;
     private String weekDay;
 }
