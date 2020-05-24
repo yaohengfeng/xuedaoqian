@@ -29,4 +29,6 @@ public interface ClassStudentsDao {
     void updateAllStudentSignInFlag(String classId);
 
     SchoolClassStudents selectUserByScsId(String classStudentId);
+
+    SchoolClassStudents selectStudentInfoByStudentId(@Param("studentId")String studentId,@Param("classId")String classId);
 }

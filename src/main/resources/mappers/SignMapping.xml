@@ -45,7 +45,7 @@
     </select>
 
     <select id="countSignNum" parameterType="String" resultType="Integer">
-        select count(*) from sign where curriculum_id=#{curriculumId}
+        select count(*) from public.sign where curriculum_id=#{curriculumId} and sign_flag=2
     </select>
 
     <update id="autoUpdateSingFlag">

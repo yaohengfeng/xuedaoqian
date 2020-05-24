@@ -29,6 +29,12 @@
         from public.school_class_students where class_id=#{classId}
     </select>
 
+    <select id="selectStudentInfoByStudentId" resultMap="BaseResultType" parameterType="String">
+        select
+        <include refid="Base_Column_List"/>
+        from public.school_class_students where student_id=#{studentId} and class_id=#{classId}
+    </select>
+
     <select id="selectUserByScsId" parameterType="String" resultMap="BaseResultType">
         select
         <include refid="Base_Column_List"/>

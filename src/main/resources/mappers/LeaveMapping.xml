@@ -44,7 +44,7 @@
 
     <select id="selectLeaveByUserId1" resultMap="BaseResultType1">
         select
-        leave_id,sc.class_id,sc.class_name,student_name,leave_status
+        leave_id,sc.class_id,sc.class_name,student_id,leave_status
         from public.leave l
         join public.school_class sc
         on l.class_id=sc.class_id

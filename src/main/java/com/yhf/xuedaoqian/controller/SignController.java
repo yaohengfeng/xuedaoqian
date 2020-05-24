@@ -36,7 +36,7 @@ public class SignController {
     @PostMapping("createSignIn")
     @ApiOperation("创建签到")
     @ApiImplicitParams({
-            @ApiImplicitParam(paramType = "query", name = "classId", required = true),
+//            @ApiImplicitParam(paramType = "query", name = "classId", required = true),
             @ApiImplicitParam(paramType = "query", name = "curriculumId", required = true),
             @ApiImplicitParam(paramType = "query", name = "createUserId", required = true),
             @ApiImplicitParam(paramType = "query", name = "signInCode", required = true)
@@ -63,12 +63,28 @@ public class SignController {
     @ApiImplicitParams({
             @ApiImplicitParam(paramType = "query", name = "signId", required = true),
             @ApiImplicitParam(paramType = "query", name = "studentId", required = true),
-            @ApiImplicitParam(paramType = "query", name = "signInCode", required = true)
+            @ApiImplicitParam(paramType = "query", name = "signInCode", required = true),
+            @ApiImplicitParam(paramType = "query", name = "curriculumId", required = true)
     })
     @ResponseBody
     public Boolean changeSignStats(SignReps signReps) {
         System.out.println(signReps);
         signApi.updateSignState1(signReps);
+        return true;
+    }
+
+    @PostMapping("changeSignStatsByTeacher")
+    @ApiOperation("老师对人员签到状态的修改")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "signId", required = true),
+            @ApiImplicitParam(paramType = "query", name = "studentId", required = true),
+            @ApiImplicitParam(paramType = "query", name = "curriculumId", required = true),
+            @ApiImplicitParam(paramType = "query", name = "signFlag", required = true)
+    })
+    @ResponseBody
+    public Boolean changeSignStatsByTeacher(SignReps signReps) {
+//        System.out.println(signReps);
+        signApi.updateSignState2(signReps);
         return true;
     }
 

@@ -59,7 +59,7 @@ public class LeaveService implements LeaveApi {
             throw new RuntimeException("请输入正确的班级Id");
         }
         leave.setLeaveId(ToolUtil.getUUid());
-        int daysBetween = (int) ((leave.getLeaveStartTime().getTime() - leave.getLeaveEndTime().getTime() + 1000000) / 86400000);
+        int daysBetween = Math.abs((int)((leave.getLeaveEndTime().getTime()-leave.getLeaveStartTime().getTime())/(3600*1000*24)));
         leave.setLeaveDays(daysBetween == 0 ? 1 : daysBetween);
         leave.setCreateAt(new Date());
         leave.setUpdateAt(new Date());

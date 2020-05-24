@@ -101,4 +101,12 @@ public class WXUserService implements WXUserApi {
         }
         return user;
     }
+
+    @Override
+    public Boolean selectUserInfo(String userId) {
+        WXUser wxUser = wxUserDao.selectUserByUserId(userId);
+        return (wxUser.getSchool() != null && !"".equals(wxUser.getSchool()))
+                && (wxUser.getUserName() != null && !"".equals(wxUser.getUserName()))
+                && (wxUser.getSno() != null && !"".equals(wxUser.getSno()));
+    }
 }

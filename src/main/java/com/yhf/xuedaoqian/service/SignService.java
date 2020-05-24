@@ -3,12 +3,14 @@ package com.yhf.xuedaoqian.service;
 import com.yhf.xuedaoqian.api.SignApi;
 import com.yhf.xuedaoqian.dao.ClassStudentsDao;
 import com.yhf.xuedaoqian.dao.CurriculumDao;
+import com.yhf.xuedaoqian.dao.LeaveDao;
 import com.yhf.xuedaoqian.dao.SchoolClassDao;
 import com.yhf.xuedaoqian.dao.SignDao;
 import com.yhf.xuedaoqian.dao.SignInInfoDao;
 import com.yhf.xuedaoqian.dao.WXUserDao;
 import com.yhf.xuedaoqian.model.Curriculum;
 import com.yhf.xuedaoqian.model.KaoQinLv;
+import com.yhf.xuedaoqian.model.Leave;
 import com.yhf.xuedaoqian.model.SchoolClass;
 import com.yhf.xuedaoqian.model.SchoolClassStudents;
 import com.yhf.xuedaoqian.model.Sign;
@@ -53,39 +55,43 @@ public class SignService implements SignApi {
 
     private CurriculumDao curriculumDao;
 
+    private LeaveDao leaveDao;
 
     @Autowired
     public SignService(SignDao signDao, SchoolClassDao schoolClassDao, SignInInfoDao signInInfoDao,
-                       WXUserDao userDao, ClassStudentsDao studentsDao, CurriculumDao curriculumDao) {
+                       WXUserDao userDao, ClassStudentsDao studentsDao, CurriculumDao curriculumDao,
+                       LeaveDao leaveDao) {
         this.signDao = signDao;
         this.schoolClassDao = schoolClassDao;
         this.userDao = userDao;
         this.studentsDao = studentsDao;
         this.signInInfoDao = signInInfoDao;
         this.curriculumDao = curriculumDao;
+        this.leaveDao = leaveDao;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String createSign(Sign sign) {
-        Assert.notNull(sign.getClassId(), "班级Id不能为空");
+//        Assert.notNull(sign.getClassId(), "班级Id不能为空");
         Assert.notNull(sign.getCreateUserId(), "用户Id不能为空");
         Assert.notNull(sign.getSignInCode(), "签到码不能为空");
         Assert.notNull(sign.getCurriculumId(), "课程id不能为空");
-        SchoolClass schoolClassDb = schoolClassDao.selectClassInfo(sign.getClassId());
-        System.out.println(sign.getClassId());
-        String singId;
-        if (schoolClassDb == null) {
-            throw new RuntimeException("请输入正确的班级Id");
-        }
-        WXUser wxUserDb = userDao.selectUserByUserId(sign.getCreateUserId());
-        if (wxUserDb == null) {
-            throw new RuntimeException("请输入正确的用户Id");
-        }
         Curriculum curriculum = curriculumDao.selectCurriculumInfo(sign.getCurriculumId());
         if (curriculum == null) {
             throw new RuntimeException("请输入正确的课程Id");
         }
+//        SchoolClass schoolClassDb = schoolClassDao.selectClassInfo(curriculum.getClassId());
+//        System.out.println(sign.getClassId());
+        String singId;
+//        if (schoolClassDb == null) {
+//            throw new RuntimeException("请输入正确的班级Id");
+//        }
+        WXUser wxUserDb = userDao.selectUserByUserId(sign.getCreateUserId());
+        if (wxUserDb == null) {
+            throw new RuntimeException("请输入正确的用户Id");
+        }
+
         if (signDao.selectSignIdByCurriculumId(sign.getCurriculumId()) != null) {
             throw new RuntimeException("请结束之前的签到");
         } else {
@@ -96,7 +102,8 @@ public class SignService implements SignApi {
             sign.setSignFlag(1);
             signDao.insertSign(sign);
 //            studentsDao.updateAllStudentSignInFlag(sign.getClassId());
-            List<SchoolClassStudents> schoolClassStudents = studentsDao.selectUserByClassId(sign.getClassId());
+            System.out.println(sign.getClassId());
+            List<SchoolClassStudents> schoolClassStudents = studentsDao.selectUserByClassId(curriculum.getClassId());
             for (SchoolClassStudents s : schoolClassStudents) {
                 SignInInfo signInInfo = new SignInInfo();
                 signInInfo.setSignInInfoId(ToolUtil.getUUid());
@@ -106,6 +113,12 @@ public class SignService implements SignApi {
                 signInInfo.setCreateAt(new Date());
                 signInInfo.setUpdateAt(new Date());
                 signInInfoDao.insertSignInfo(signInInfo);
+            }
+            List<Leave> leaves = leaveDao.selectLeaveByClassId(curriculum.getClassId());
+            for (Leave l:leaves) {
+                if (l.getLeaveStartTime().before(new Date())&&(new Date().before(l.getLeaveEndTime()))&&l.getLeaveStatus()==2){
+                    signInInfoDao.updateSignFlag1(sign.getSignId(),l.getStudentId(),5);
+                }
             }
             System.out.println(singId);
             return singId;
@@ -165,20 +178,40 @@ public class SignService implements SignApi {
     public List<KaoQinLv> selectKaoQinLv(String classId, String curriculumId) {
         Assert.notNull(curriculumId, "课程Id不能为空");
         System.out.println(curriculumId);
-        if (curriculumDao.selectCurriculumInfo(curriculumId) == null) {
+        Curriculum curriculum=curriculumDao.selectCurriculumInfo(curriculumId);
+        if (curriculum == null) {
             throw new RuntimeException("请输入正确的课程id");
         }
         Integer signNum = signDao.countSignNum(curriculumId);
-        List<SchoolClassStudents> schoolClassStudentsList = studentsDao.selectUserByClassId(classId);
+        System.out.println(signNum);
+        List<SchoolClassStudents> schoolClassStudentsList = studentsDao.selectUserByClassId(curriculum.getClassId());
         List<KaoQinLv> kaoQinLvList = new ArrayList<>();
         for (SchoolClassStudents s : schoolClassStudentsList) {
             KaoQinLv kaoQinLv = new KaoQinLv();
             kaoQinLv.setStudentName(s.getStudentName());
             Integer stuSignNum = signInInfoDao.selectSignSuccessNumByStudentId(s.getStudentId());
-            kaoQinLv.setPercentage(signNum != 0 ? ((stuSignNum / (float) signNum) * 100 + "%") : "100%");
+            kaoQinLv.setPercentage(signNum != 0 ? stuSignNum.equals(signNum) ? "100%" : ((stuSignNum / (float) signNum) * 100 + "%") : "100%");
             kaoQinLvList.add(kaoQinLv);
         }
         return kaoQinLvList;
+    }
+
+    @Override
+    public void updateSignState2(SignReps signReps) {
+        Assert.notNull(signReps.getSignId(), "签到Id不能为空");
+        Assert.notNull(signReps.getStudentId(), "学生Id不能为空");
+        System.out.println(signReps.getCurriculumId());
+        Curriculum curriculum = curriculumDao.selectCurriculumInfo(signReps.getCurriculumId());
+
+        Sign signDb = signDao.selectSignBySignId(signReps.getSignId());
+        if (signDb == null) {
+            throw new RuntimeException("请输入正确的签到Id");
+        }
+        if (signDb.getSignFlag() != 1) {
+            throw new RuntimeException("签到已结束，不能签到！");
+        }
+        System.out.println(signReps.getSignId()+","+signReps.getStudentId()+","+signReps.getSignFlag());
+        signInInfoDao.updateSignFlag1(signReps.getSignId(), signReps.getStudentId(),signReps.getSignFlag());
     }
 
 
@@ -189,11 +222,6 @@ public class SignService implements SignApi {
         Assert.notNull(signInReps.getClassId(), "班级Id不能为空");
         Assert.notNull(signInReps.getStudentId(), "学生Id不能为空");
         Assert.notNull(signInReps.getSignInCode(), "签到码不能为空");
-
-        SchoolClass schoolClass = schoolClassDao.selectClassInfo(signInReps.getClassId());
-        if (schoolClass == null) {
-            throw new RuntimeException("请输入正确的班级Id");
-        }
         Sign signDb = signDao.selectSignBySignId(signInReps.getSignId());
         if (signDb == null) {
             throw new RuntimeException("请输入正确的签到Id");
@@ -214,6 +242,23 @@ public class SignService implements SignApi {
         Assert.notNull(signReps.getSignId(), "签到Id不能为空");
         Assert.notNull(signReps.getStudentId(), "学生Id不能为空");
         Assert.notNull(signReps.getSignInCode(), "签到码不能为空");
+        System.out.println(signReps.getCurriculumId());
+        Curriculum curriculum = curriculumDao.selectCurriculumInfo(signReps.getCurriculumId());
+        if (curriculum == null) {
+            throw new RuntimeException("请输入正确的课程Id");
+        }
+        String sId = signInInfoDao.selectSignInfoStudentId(signReps.getStudentId());
+        if (sId == null) {
+            SchoolClassStudents schoolClassStudents = studentsDao.selectStudentInfoByStudentId(signReps.getStudentId(),curriculum.getClassId());
+            SignInInfo signInInfo = new SignInInfo();
+            signInInfo.setSignInInfoId(ToolUtil.getUUid());
+            BeanUtils.copyProperties(schoolClassStudents, signInInfo);
+            signInInfo.setSignId(signReps.getSignId());
+            signInInfo.setCurriculumId(signReps.getCurriculumId());
+            signInInfo.setCreateAt(new Date());
+            signInInfo.setUpdateAt(new Date());
+            signInInfoDao.insertSignInfo(signInInfo);
+        }
         Sign signDb = signDao.selectSignBySignId(signReps.getSignId());
         if (signDb == null) {
             throw new RuntimeException("请输入正确的签到Id");

@@ -55,15 +55,21 @@
         where sign_id=#{signId} and student_id=#{studentId}
     </update>
 
+    <update id="updateSignFlag1">
+        update public.sign_in_info
+        set sign_flag=#{signFlag}, update_at = now()
+        where sign_id=#{signId} and student_id=#{studentId}
+    </update>
+
     <select id="selectSignSuccess" parameterType="String">
         select student_id,count(*)
-        from sign_in_info
+        from public.sign_in_info
         where curriculum_id=#{curriculumId} and sign_flag=0 group by student_id
     </select>
 
     <select id="selectSignSuccessNum" parameterType="String" resultType="com.yhf.xuedaoqian.model.reps.KaoQinReps">
         select user_name,count(*) successSignNum
-        from sign_in_info sii
+        from public.sign_in_info sii
         join wx_user wu on sii.student_id=wu.user_id
         where curriculum_id=#{curriculumId} and sign_flag=1
         group by sii.student_id,user_name
@@ -72,8 +78,13 @@
 
     <select id="selectSignSuccessNumByStudentId" parameterType="String" resultType="Integer">
         select count(*)
-        from sign_in_info
-        where student_id=#{studentId} and sign_flag=1
+        from public.sign_in_info
+        where student_id=#{studentId} and (sign_flag=1 or sign_flag =5)
     </select>
 
+    <select id="selectSignInfoStudentId" parameterType="String" resultType="String">
+        select sign_in_info_id
+        from public.sign_in_info
+        where student_id=#{studentId}
+    </select>
 </mapper>

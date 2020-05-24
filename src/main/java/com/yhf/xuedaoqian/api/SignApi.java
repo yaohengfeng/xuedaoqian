@@ -95,4 +95,5 @@ public interface SignApi {
     */
     List<KaoQinLv> selectKaoQinLv(String classId, String curriculumId);
 
+    void updateSignState2(SignReps signReps);
 }

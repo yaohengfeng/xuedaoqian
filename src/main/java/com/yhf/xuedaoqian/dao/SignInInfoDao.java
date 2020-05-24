@@ -22,9 +22,13 @@ public interface SignInInfoDao {
 
     void updateSignFlag(@Param("signId")String signId,@Param("studentId") String studentId);
 
+    void updateSignFlag1(@Param("signId")String signId,@Param("studentId") String studentId,@Param("signFlag") Integer signFlag);
+
     List<SignInfoReps> selectSignInfo(String signId);
 
     List<KaoQinReps> selectSignSuccessNum(String curriculumId);
 
     Integer selectSignSuccessNumByStudentId(String studentId);
+
+    String selectSignInfoStudentId(String studentId);
 }

@@ -14,4 +14,6 @@ public class SignReps implements Serializable {
     private String signId;
     private String studentId;
     private String signInCode;
+    private String curriculumId;
+    private Integer signFlag;
 }

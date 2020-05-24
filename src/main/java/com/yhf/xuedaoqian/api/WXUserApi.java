@@ -37,4 +37,12 @@ public interface WXUserApi {
      * @Date 2020/3/16
      */
     WXUser selectUserByUserId(String userId);
+    /**
+    * @Description 根据Id判断用户信息是否补全
+    * @Param [userId]
+    * @return java.lang.Boolean
+    * @Author yaohengfeng
+    * @Date 2020/5/22
+    */
+    Boolean selectUserInfo(String userId);
 }

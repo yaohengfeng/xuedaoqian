@@ -36,6 +36,17 @@ public class WXUserController {
         return userApi.selectUserByUserId(userId);
     }
 
+
+    @PostMapping(value = "selectUserInfoBoolean")
+    @ApiOperation(value = "根据用户Id查询信息是否补全")
+    @ApiImplicitParams({
+            @ApiImplicitParam(paramType = "query", name = "userId", required = true)
+    })
+    @ResponseBody
+    public Boolean selectUserInfoBoolean(@RequestParam String userId) {
+        return userApi.selectUserInfo(userId);
+    }
+
     @GetMapping(value = "wxUserLogin")
     @ApiOperation(value = "用户登录")
     @ApiImplicitParams({
