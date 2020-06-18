@@ -39,7 +39,7 @@
         <flywaydb_version>5.2.4</flywaydb_version>
 
         <!-- 常用工具 jackson,加密解密,jwt，接口文档,lombok -->
-        <jackson_version>2.9.8</jackson_version>
+        <jackson_version>2.10.0.pr1</jackson_version>
         <commons_codec_version>1.10</commons_codec_version>
         <jwt_version>0.9.0</jwt_version>
         <swagger_ui_version>2.9.2</swagger_ui_version>
