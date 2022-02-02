@@ -34,7 +34,7 @@
         <!-- 数据库相关 -->
         <druid_version>1.1.17</druid_version>
         <pagehelper_version>1.2.13</pagehelper_version>
-        <postgresql_driver_version>42.2.8</postgresql_driver_version>
+        <postgresql_driver_version>42.2.25</postgresql_driver_version>
         <mybatis_spring_boot_version>2.1.1</mybatis_spring_boot_version>
         <flywaydb_version>5.2.4</flywaydb_version>
 
